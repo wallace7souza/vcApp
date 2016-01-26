@@ -1,0 +1,26 @@
+<ion-view title="Endereco" hide-back-button="true">
+    <ion-content overflow-scroll="true" padding="true" scroll="false" class="has-header">
+        <form class="list">
+            <ion-list>
+                <div ng-controller="enderecoCtrl">
+                    <label class="item item-input">
+                        <input type="text" ng-model="endereco.cep" ng-blur="pegaCep()" placeholder="CEP">
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" ng-model="endereco.uf" placeholder="Estado">
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" ng-model="endereco.cidade" placeholder="Cidade">
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" ng-model="endereco.bairro" placeholder="Bairro">
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" ng-model="endereco.logradouro" placeholder="Logradouro">
+                    </label>
+                </div>
+            </ion-list>
+            <button ng-click="adicionarEndereco(endereco)" class="button button-stable button-block">Salvar</button>
+        </form>
+    </ion-content>
+</ion-view>
