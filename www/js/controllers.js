@@ -39,7 +39,41 @@ angular.module('app.controllers', [])
 
 })
    
-.controller('logradouroCtrl', function($scope) {
+.controller('logradouroCtrl', function ($scope, $http, $window) {
+
+	var pegaMsgsLogra = function () {
+		idCep = $window.localStorage.getItem('idCep');
+		idUsuario = $window.localStorage.getItem('idUsuario');
+		/*var dados = {
+			idUsuario: $window.localStorage.getItem('idUsuario'),
+			idCep: $window.localStorage.getItem('idCep')
+		}*/
+
+		$http.get("http://www.vigilantescomunitarios.com/www/php/pegaMsgsLogra.php?idUsuario="+$stateParams.idUsuario"&idCep="+$stateParams.idCep).success(function (data){
+			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/
+			//console.log(data);
+			$scope.mensagens = data;
+		});
+	}
+
+	pegaMsgsLogra();
+
+	$scope.enviarMsg = function (msg) {
+		//console.log(msg);
+	    var enviaMsg = {
+	    	msg: msg,
+	    	idUsuario: $window.localStorage.getItem('idUsuario'),
+	    	idCep: $window.localStorage.getItem('idCep'),
+	    	nome: $window.localStorage.getItem('nome')
+	    }
+
+		$http.post("http://www.vigilantescomunitarios.com/www/php/enviaMsgLogra.php", enviaMsg).success(function (data){
+			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/enviaMsgLogra.php
+			//console.log(data);
+			//$scope.msgForm = null;
+		});
+		pegaMsgsLogra();
+	}
 
 })
    
