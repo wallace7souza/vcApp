@@ -1,4 +1,4 @@
-angular.module('app.controllers', [])
+angular.module('app.controllers', ['ui.utils.masks'])
   
 .controller('loginCtrl', function ($scope, $http, $state, $location, $window) {
 
@@ -8,6 +8,8 @@ angular.module('app.controllers', [])
 	}
 
 	$scope.msgErro = '';
+
+	$scope.msgExiste = '';
 
 	$scope.logar = function (usuario) {
 
@@ -30,15 +32,26 @@ angular.module('app.controllers', [])
 })
    
 .controller('enderecoCtrl', function ($scope, $http, $location, $window) {
+	$scope.endereco = {};
 
 	$scope.pegaCep = function () {
 	    //console.log($scope.endereco.cep);
-	    $http.get("http://www.vigilantescomunitarios.com/www/php/pegaCep.php?cep="+$scope.endereco.cep).success(function (endereco){
-	    	//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/pegaCep.php
-	    	console.log(endereco);
-	    	$scope.endereco = endereco;
-	    });
+	    if(!$scope.endereco.cep){
+	    	return;
+	    }
+	    var cep = $scope.endereco.cep;
+	    //console.log(cep);
+	    if(cep.length <= 8){
+	    	return
+	    }else if(cep.length === 9){
+	    	$http.get("http://www.vigilantescomunitarios.com/www/php/pegaCep.php?cep="+$scope.endereco.cep).success(function (endereco){
+	    		//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/pegaCep.php
+	    		//console.log(endereco);
+	    		$scope.endereco = endereco;
+	    	});
+	    }
 	 }
+	 $scope.$watch('endereco.cep', $scope.pegaCep());
 
 	$scope.adicionarEndereco = function (endereco) {
 		$http.post("http://www.vigilantescomunitarios.com/www/php/salvaEndereco.php", endereco).success(function (data){
@@ -56,12 +69,20 @@ angular.module('app.controllers', [])
    
 .controller('usuarioCtrl', function ($scope, $http, $window, $location) {
 
-	$scope.pegaUsuario = function (usuario) {
+	$scope.salvaUsuario = function (usuario) {
+		// O cep é pego para salvar junto com os dados do usuário
 		var idCep = $window.localStorage.getItem('idCep');
 		usuario.idCep = idCep;
+
 		$http.post("http://www.vigilantescomunitarios.com/www/php/salvaUsuario.php", usuario).success(function (data){
 			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/salvaUsuario.php
 			//console.log(data);
+			//console.log(JSON.stringify(data));
+			if(data.cod === 1){
+				$location.path('/cadastraUsuario');
+				$scope.msgExiste = "Usuário já existente. Tente outro.";
+			}
+
 		});
 		$location.path('/page10');
 	}
@@ -76,12 +97,8 @@ angular.module('app.controllers', [])
 	var pegaMsgsEstado = function () {
 		idCep = $window.localStorage.getItem('idCep');
 		idUsuario = $window.localStorage.getItem('idUsuario');
-		var dados = {
-			idUsuario: $window.localStorage.getItem('idUsuario'),
-			idCep: $window.localStorage.getItem('idCep')
-		}
 
-		$http.post("http://www.vigilantescomunitarios.com/www/php/pegaMsgsEstado.php", dados).success(function (data){
+		$http.get("http://www.vigilantescomunitarios.com/www/php/pegaMsgsEstado.php?idUsuario="+idUsuario+"&idCep="+idCep).success(function (data){
 			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/pegaMsgsEstado.php
 			console.log(data);
 			$scope.mensagens = data;
@@ -96,12 +113,12 @@ angular.module('app.controllers', [])
 	var pegaMsgsCidade = function () {
 		idCep = $window.localStorage.getItem('idCep');
 		idUsuario = $window.localStorage.getItem('idUsuario');
-		var dados = {
+		/*var dados = {
 			idUsuario: $window.localStorage.getItem('idUsuario'),
 			idCep: $window.localStorage.getItem('idCep')
-		}
+		}*/
 
-		$http.post("http://www.vigilantescomunitarios.com/www/php/pegaMsgsCidade.php", dados).success(function (data){
+		$http.get("http://www.vigilantescomunitarios.com/www/php/pegaMsgsCidade.php?idUsuario="+idUsuario+"&idCep="+idCep).success(function (data){
 			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/pegaMsgsCidade.php
 			//console.log(data);
 			$scope.mensagens = data;
@@ -116,12 +133,12 @@ angular.module('app.controllers', [])
 	var pegaMsgsBairro = function () {
 		idCep = $window.localStorage.getItem('idCep');
 		idUsuario = $window.localStorage.getItem('idUsuario');
-		var dados = {
+		/*var dados = {
 			idUsuario: $window.localStorage.getItem('idUsuario'),
 			idCep: $window.localStorage.getItem('idCep')
-		}
+		}*/
 
-		$http.post("http://www.vigilantescomunitarios.com/www/php/pegaMsgsBairro.php", dados).success(function (data){
+		$http.get("http://www.vigilantescomunitarios.com/www/php/pegaMsgsBairro.php?idUsuario="+idUsuario+"&idCep="+idCep).success(function (data){
 			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/pegaMsgsBairro.php
 			//console.log(data);
 			$scope.mensagens = data;
@@ -131,29 +148,31 @@ angular.module('app.controllers', [])
 	pegaMsgsBairro();
 })
    
-.controller('logradouroCtrl', function ($scope, $http, $window) {
+.controller('logradouroCtrl', function ($scope, $http, $window, $stateParams) {
+
+	$scope.mensagem = {
+	    msg:""
+	  };
 
 	var pegaMsgsLogra = function () {
 		idCep = $window.localStorage.getItem('idCep');
 		idUsuario = $window.localStorage.getItem('idUsuario');
-		/*var dados = {
-			idUsuario: $window.localStorage.getItem('idUsuario'),
-			idCep: $window.localStorage.getItem('idCep')
-		}*/
 
-		$http.get("http://www.vigilantescomunitarios.com/www/php/pegaMsgsLogra.php?idUsuario="+$stateParams.idUsuario"&idCep="+$stateParams.idCep).success(function (data){
+		//$http.post("http://www.vigilantescomunitarios.com/www/php/pegaMsgsLogra.php", dados).success(function (data){
+		$http.get("http://www.vigilantescomunitarios.com/www/php/pegaMsgsLogra.php?idUsuario="+idUsuario+"&idCep="+idCep).success(function (data){
 			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/
 			//console.log(data);
 			$scope.mensagens = data;
+
 		});
 	}
 
 	pegaMsgsLogra();
 
-	$scope.enviarMsg = function (msg) {
-		//console.log(msg);
+	$scope.enviarMsg = function (mensagem) {
+		//console.log(mensagem);
 	    var enviaMsg = {
-	    	msg: msg,
+	    	mensagem: mensagem,
 	    	idUsuario: $window.localStorage.getItem('idUsuario'),
 	    	idCep: $window.localStorage.getItem('idCep'),
 	    	nome: $window.localStorage.getItem('nome')
@@ -162,9 +181,12 @@ angular.module('app.controllers', [])
 		$http.post("http://www.vigilantescomunitarios.com/www/php/enviaMsgLogra.php", enviaMsg).success(function (data){
 			//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/enviaMsgLogra.php
 			//console.log(data);
-			//$scope.msgForm = null;
+			pegaMsgsLogra();
+			$scope.mensagem = {
+		      msg: ""
+		    }
+
 		});
-		pegaMsgsLogra();
 	}
 
 })
