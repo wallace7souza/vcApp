@@ -1,26 +1,27 @@
 <ion-view title="Endereco" hide-back-button="true">
     <ion-content overflow-scroll="true" padding="true" scroll="false" class="has-header">
-        <form class="list">
+        <form name="enderecoForm" class="list">
             <ion-list>
                 <div ng-controller="enderecoCtrl">
                     <label class="item item-input">
-                        <input type="text" ng-model="endereco.cep" ng-blur="pegaCep()" placeholder="CEP">
+                      <input type="text" ng-model="endereco.cep" ui-br-cep-mask placeholder="CEP">
                     </label>
                     <label class="item item-input">
-                        <input type="text" ng-model="endereco.uf" placeholder="Estado">
+                        <input type="text" ng-model="endereco.uf" placeholder="Estado" name="estado" required readonly="true">
                     </label>
                     <label class="item item-input">
-                        <input type="text" ng-model="endereco.cidade" placeholder="Cidade">
+                        <input type="text" ng-model="endereco.cidade" placeholder="Cidade" name="cidade" required readonly="true">
                     </label>
                     <label class="item item-input">
-                        <input type="text" ng-model="endereco.bairro" placeholder="Bairro">
+                        <input type="text" ng-model="endereco.bairro" placeholder="Bairro" name="bairro" required readonly="true">
                     </label>
                     <label class="item item-input">
-                        <input type="text" ng-model="endereco.logradouro" placeholder="Logradouro">
+                       <input type="text" ng-model="endereco.logradouro" placeholder="Logradouro" name="logradouro" required readonly="true">
                     </label>
+                    <button class="button button-stable button-block" ng-disabled="enderecoForm.$invalid" ng-click="adicionarEndereco(endereco)">Salvar</button>
+                    <div ng-show="enderecoForm.logradouro.$invalid">CEP com dados inválido ou inexistente</div>
                 </div>
             </ion-list>
-            <button ng-click="adicionarEndereco(endereco)" class="button button-stable button-block">Salvar</button>
         </form>
     </ion-content>
 </ion-view>
