@@ -41,17 +41,18 @@ angular.module('app.controllers', ['ui.utils.masks'])
 	    }
 	    var cep = $scope.endereco.cep;
 	    //console.log(cep);
-	    if(cep.length <= 8){
-	    	return
-	    }else if(cep.length === 9){
+	    if(cep.length < 8){
+	    	return;
+	    }else {
 	    	$http.get("http://www.vigilantescomunitarios.com/www/php/pegaCep.php?cep="+$scope.endereco.cep).success(function (endereco){
 	    		//http://localhost:8888/sistemas/sistemas_web/ionic/vcApp/www/php/pegaCep.php
 	    		//console.log(endereco);
 	    		$scope.endereco = endereco;
 	    	});
 	    }
-	 }
-	 $scope.$watch('endereco.cep', $scope.pegaCep());
+	 };
+
+	 $scope.$watch('endereco.cep', $scope.pegaCep);
 
 	$scope.adicionarEndereco = function (endereco) {
 		$http.post("http://www.vigilantescomunitarios.com/www/php/salvaEndereco.php", endereco).success(function (data){
